@@ -78,10 +78,10 @@ for infile in *_R1.fastq.gz
   do
   base=$(basename ${infile} _R1.fastq.gz)
   java -jar ~/Desktop/seq_tools/Trimmomatic-0.39/trimmomatic-0.39.jar PE \
-  ${infile} ${base}_R2.fastq.gz \
-  ${base}_R1_trim.fastq.gz ${base}_R1_untrim.fastq.gz \
-  ${base}_R2_trim.fastq.gz ${base}_R2_untrim.fastq.gz \
-  ILLUMINACLIP:NexteraPE-PE.fa:2:40:15 SLIDINGWINDOW:4:20 MINLEN:25
+            ${infile} ${base}_R2.fastq.gz \
+            ${base}_R1_trim.fastq.gz ${base}_R1_untrim.fastq.gz \
+            ${base}_R2_trim.fastq.gz ${base}_R2_untrim.fastq.gz \
+            ILLUMINACLIP:NexteraPE-PE.fa:2:40:15 SLIDINGWINDOW:4:20 MINLEN:25
   done
 mv *trim.fastq.gz ~/Desktop/mRNA_rz_2022/mRNA_data_processed/mRNA_data_trim
 
@@ -120,19 +120,19 @@ for infile in *_R1_trim.fastq.gz
   do
   base=$(basename ${infile} _R1_trim.fastq.gz)
   bwa mem ~/Desktop/ref_genome/ref_genome.fna \ #use mem method and call reference genome
-  ${infile} ${base}_R2_trim.fastq.gz > \
-  ~/Desktop/mRNA_rz_2022/mRNA_data_processed/sam/${base}_align.sam
+          ${infile} ${base}_R2_trim.fastq.gz > \
+          ~/Desktop/mRNA_rz_2022/mRNA_data_processed/sam/${base}_align.sam
   done
 
 echo "Sequence Alignment Completed!"
 
 
 # ---------- Compress into BAM & Sorting ------------------------------
-echo "Compressing .SAM and Sorting ..."
+echo "Compressing SAM and Sorting ..."
 
 cd ~/Desktop/mRNA_rz_2022/mRNA_data_processed/sam
 
-for infile in *_alignment.sam
+for infile in *_align.sam
   do
   base=$(basename ${infile} _alignment.sam)
   samtools view -S -b ./${infile} > ~/Desktop/mRNA_rz_2022/mRNA_data_processed/bam/${base}_align.bam
@@ -144,4 +144,22 @@ for infile in *_alignment.sam
 
 echo "BAM Files and Flagstat Exported!"
 
+
 # ---------- Variant Calling Format ------------------------------
+echo "Generating Variant Calling Format ..."
+
+cd ~/Desktop/mRNA_rz_2022/mRNA_data_processed/bam
+
+for infile in *_align_sorted.bam
+  do 
+  base=$(basename ${infile} _align_sorted.bam)
+  bcftools mpileup -O b -o ~/Desktop/mRNA_rz_2022/mRNA_data_processed/bcf/${base}_raw.bcf \
+                        -f ~/Desktop/mRNA_rz_2022/ref_genome/ref_genome.fna ./${infile}
+  bcftools call --ploidy 2 -m -v -o ~/Desktop/mRNA_rz_2022/mRNA_data_processed/vcf/${base}.vcf \ 
+                                    ~/Desktop/mRNA_rz_2022/mRNA_data_processed/bcf/${base}_raw.bcf
+  vcfutils.pl varFilter ~/Desktop/mRNA_rz_2022/mRNA_data_processed/vcf/${base}.vcf > \ 
+                        ~/Desktop/mRNA_rz_2022/mRNA_data_processed/vcf/${base}_final.vcf
+  done
+
+echo "VCF Files Exported"
+
