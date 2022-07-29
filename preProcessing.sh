@@ -54,10 +54,10 @@ echo "Running FASTQC for Untrimmed Data ..."
 
 cd ~/Desktop/mRNA_rz_2022/mRNA_data_raw 
 fastqc ./*.fastq.gz #perform quality check on all mRNA samples (both forward and reverse)
-mv ./*fastqc.html ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_untirm
-mv ./*fastqc.zip ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_untirm 
+mv ./*fastqc.html ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_untrim
+mv ./*fastqc.zip ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_untrim 
 
-cd ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_untirm
+cd ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_untrim
 for filename in *.zip
   do
   unzip $filename
@@ -93,10 +93,10 @@ echo "Running FASTQC for Trimmed Data ..."
 
 cd ~/Desktop/mRNA_rz_2022/mRNA_data_processed/mRNA_data_trim
 fastqc ./*.fastq.gz 
-mv ./*fastqc.html ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_tirm
-mv ./*fastqc.zip ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_tirm 
+mv ./*fastqc.html ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_trim
+mv ./*fastqc.zip ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_trim 
 
-cd ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_tirm
+cd ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_trim
 for filename in *.zip
   do
   unzip $filename
