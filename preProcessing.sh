@@ -52,20 +52,20 @@ echo "Finish Setting-Up Directories Successfully!"
 # ---------- FASTQC for Untrimmed Data ------------------------------
 echo "Running FASTQC for Untrimmed Data ..."
 
+## perform quality check on all mRNA samples (both forward and reverse) and store in separate file
 cd ~/Desktop/mRNA_rz_2022/mRNA_data_raw 
-fastqc ./*.fastq.gz #perform quality check on all mRNA samples (both forward and reverse)
+fastqc ./*.fastq.gz 
 mv ./*fastqc.html ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_untrim
 mv ./*fastqc.zip ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_untrim 
 
+## summarize qualities and export the fail ones
 cd ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_untrim
 for filename in *.zip
-  do
+do
   unzip $filename
-  done
-
+done
 cat */summary.txt > ~/Desktop/mRNA_rz_2022/mRNA_data_processed/docs/qc_summary/fastqc_summary_untrim.txt
-grep FAIL ~/Desktop/mRNA_rz_2022/mRNA_data_processed/docs/qc_summary/fastqc_summary_untrim.txt > \ 
-          ~/Desktop/mRNA_rz_2022/mRNA_data_processed/docs/qc_summary/fail_fastqc_summary_untrim.txt
+grep FAIL ~/Desktop/mRNA_rz_2022/mRNA_data_processed/docs/qc_summary/fastqc_summary_untrim.txt 
 
 echo "FASTQC Summaries Exported!"
 
@@ -73,16 +73,17 @@ echo "FASTQC Summaries Exported!"
 # ---------- Filter and Trim mRNA Data ------------------------------
 echo "Trimming and Filtering Low-Quality mRNA Data ..."
 
+# use trimmomatic to filter the low quality data
 cd ~/Desktop/mRNA_rz_2022/mRNA_data_raw
 for infile in *_R1.fastq.gz
-  do
+do
   base=$(basename ${infile} _R1.fastq.gz)
-  java -jar ~/Desktop/seq_tools/Trimmomatic-0.39/trimmomatic-0.39.jar PE \
+  java -jar ~/Desktop/mRNA_rz_2022/seq_tools/Trimmomatic-0.39/trimmomatic-0.39.jar PE \
             ${infile} ${base}_R2.fastq.gz \
             ${base}_R1_trim.fastq.gz ${base}_R1_untrim.fastq.gz \
             ${base}_R2_trim.fastq.gz ${base}_R2_untrim.fastq.gz \
             ILLUMINACLIP:NexteraPE-PE.fa:2:40:15 SLIDINGWINDOW:4:20 MINLEN:25
-  done
+done
 mv *trim.fastq.gz ~/Desktop/mRNA_rz_2022/mRNA_data_processed/mRNA_data_trim
 
 echo "Complete Filtering Process!"
@@ -91,20 +92,20 @@ echo "Complete Filtering Process!"
 # ---------- FASRQC for Trimmed Data ------------------------------
 echo "Running FASTQC for Trimmed Data ..."
 
+## perform quality check on trimmed mRNA samples
 cd ~/Desktop/mRNA_rz_2022/mRNA_data_processed/mRNA_data_trim
 fastqc ./*.fastq.gz 
 mv ./*fastqc.html ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_trim
 mv ./*fastqc.zip ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_trim 
 
+## summarize qualities and export the fail ones
 cd ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_trim
 for filename in *.zip
-  do
+do
   unzip $filename
-  done
-
+done
 cat */summary.txt > ~/Desktop/mRNA_rz_2022/mRNA_data_processed/docs/qc_summary/fastqc_summary_trim.txt
-grep FAIL ~/Desktop/mRNA_rz_2022/mRNA_data_processed/docs/qc_summary/fastqc_summary_trim.txt > \ 
-          ~/Desktop/mRNA_rz_2022/mRNA_data_processed/docs/qc_summary/fail_fastqc_summary_trim.txt
+grep FAIL ~/Desktop/mRNA_rz_2022/mRNA_data_processed/docs/qc_summary/fastqc_summary_trim.txt
           
 echo "FASTQC Summaries Exported!"
 
@@ -112,17 +113,17 @@ echo "FASTQC Summaries Exported!"
 # ---------- Sequence Alignment w/z ref_genome ------------------------------
 echo "Running Sequence Alignment ..."
 
-bwa index ~/Desktop/mRNA_rz_2022/ref_genome/ref_genome.fna #index the referencing genome
+bwa index ~/Desktop/mRNA_rz_2022/ref_genome/ref_genome.fna ###index the referencing genome
 
 cd ~/Desktop/mRNA_rz_2022/mRNA_data_processed/mRNA_data_trim
 
 for infile in *_R1_trim.fastq.gz
-  do
+do
   base=$(basename ${infile} _R1_trim.fastq.gz)
-  bwa mem ~/Desktop/ref_genome/ref_genome.fna \ #use mem method and call reference genome
+  bwa mem ~/Desktop/ref_genome/ref_genome.fna \ ###use mem method and call reference genome
           ${infile} ${base}_R2_trim.fastq.gz > \
           ~/Desktop/mRNA_rz_2022/mRNA_data_processed/sam/${base}_align.sam
-  done
+done
 
 echo "Sequence Alignment Completed!"
 
@@ -133,14 +134,14 @@ echo "Compressing SAM and Sorting ..."
 cd ~/Desktop/mRNA_rz_2022/mRNA_data_processed/sam
 
 for infile in *_align.sam
-  do
+do
   base=$(basename ${infile} _alignment.sam)
   samtools view -S -b ./${infile} > ~/Desktop/mRNA_rz_2022/mRNA_data_processed/bam/${base}_align.bam
   samtools sort -o ~/Desktop/mRNA_rz_2022/mRNA_data_processed/bam/${base}_align_sorted.bam \
                    ~/Desktop/mRNA_rz_2022/mRNA_data_processed/bam/${base}_align.bam
   samtools flagstat ~/Desktop/mRNA_rz_2022/mRNA_data_processed/bam/${base}_align.bam > \
                     ~/Desktop/mRNA_rz_2022/mRNA_data_processed/docs/bam_flagstat/${base}_bam_flagstat.txt
-  done
+done
 
 echo "BAM Files and Flagstat Exported!"
 
@@ -151,7 +152,7 @@ echo "Generating Variant Calling Format ..."
 cd ~/Desktop/mRNA_rz_2022/mRNA_data_processed/bam
 
 for infile in *_align_sorted.bam
-  do 
+do 
   base=$(basename ${infile} _align_sorted.bam)
   bcftools mpileup -O b -o ~/Desktop/mRNA_rz_2022/mRNA_data_processed/bcf/${base}_raw.bcf \
                         -f ~/Desktop/mRNA_rz_2022/ref_genome/ref_genome.fna ./${infile}
@@ -159,7 +160,7 @@ for infile in *_align_sorted.bam
                                     ~/Desktop/mRNA_rz_2022/mRNA_data_processed/bcf/${base}_raw.bcf
   vcfutils.pl varFilter ~/Desktop/mRNA_rz_2022/mRNA_data_processed/vcf/${base}.vcf > \ 
                         ~/Desktop/mRNA_rz_2022/mRNA_data_processed/vcf/${base}_final.vcf
-  done
+done
 
 echo "VCF Files Exported"
 
