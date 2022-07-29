@@ -54,18 +54,18 @@ echo "Running FASTQC for Untrimmed Data ..."
 
 cd ~/Desktop/mRNA_rz_2022/mRNA_data_raw 
 fastqc ./*.fastq.gz #perform quality check on all mRNA samples (both forward and reverse)
-mv ./*fastqc.html ~/Desktop/mRNA_rz_2022/RNA_data_processed/fastqc_untirm
-mv ./*fastqc.zip ~/Desktop/mRNA_rz_2022/RNA_data_processed/fastqc_untirm 
+mv ./*fastqc.html ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_untirm
+mv ./*fastqc.zip ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_untirm 
 
-cd ~/Desktop/mRNA_rz_2022/RNA_data_processed/fastqc_untirm
+cd ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_untirm
 for filename in *.zip
   do
   unzip $filename
   done
 
-cat */summary.txt > ~/Desktop/mRNA_rz_2022/RNA_data_processed/docs/qc_summary/fastqc_summary_untrim.txt
-grep FAIL ~/Desktop/mRNA_rz_2022/RNA_data_processed/docs/qc_summary/fastqc_summary_untrim.txt > \ 
-          ~/Desktop/mRNA_rz_2022/RNA_data_processed/docs/qc_summary/fail_fastqc_summary_untrim.txt
+cat */summary.txt > ~/Desktop/mRNA_rz_2022/mRNA_data_processed/docs/qc_summary/fastqc_summary_untrim.txt
+grep FAIL ~/Desktop/mRNA_rz_2022/mRNA_data_processed/docs/qc_summary/fastqc_summary_untrim.txt > \ 
+          ~/Desktop/mRNA_rz_2022/mRNA_data_processed/docs/qc_summary/fail_fastqc_summary_untrim.txt
 
 echo "FASTQC Summaries Exported!"
 
@@ -93,18 +93,18 @@ echo "Running FASTQC for Trimmed Data ..."
 
 cd ~/Desktop/mRNA_rz_2022/mRNA_data_processed/mRNA_data_trim
 fastqc ./*.fastq.gz 
-mv ./*fastqc.html ~/Desktop/mRNA_rz_2022/RNA_data_processed/fastqc_tirm
-mv ./*fastqc.zip ~/Desktop/mRNA_rz_2022/RNA_data_processed/fastqc_tirm 
+mv ./*fastqc.html ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_tirm
+mv ./*fastqc.zip ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_tirm 
 
-cd ~/Desktop/mRNA_rz_2022/RNA_data_processed/fastqc_tirm
+cd ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_tirm
 for filename in *.zip
   do
   unzip $filename
   done
 
-cat */summary.txt > ~/Desktop/mRNA_rz_2022/RNA_data_processed/docs/qc_summary/fastqc_summary_trim.txt
-grep FAIL ~/Desktop/mRNA_rz_2022/RNA_data_processed/docs/qc_summary/fastqc_summary_trim.txt > \ 
-          ~/Desktop/mRNA_rz_2022/RNA_data_processed/docs/qc_summary/fail_fastqc_summary_trim.txt
+cat */summary.txt > ~/Desktop/mRNA_rz_2022/mRNA_data_processed/docs/qc_summary/fastqc_summary_trim.txt
+grep FAIL ~/Desktop/mRNA_rz_2022/mRNA_data_processed/docs/qc_summary/fastqc_summary_trim.txt > \ 
+          ~/Desktop/mRNA_rz_2022/mRNA_data_processed/docs/qc_summary/fail_fastqc_summary_trim.txt
           
 echo "FASTQC Summaries Exported!"
 
