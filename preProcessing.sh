@@ -2,15 +2,21 @@
 # Ronghao Zhang on 2022-07-17
 
 
-# ---------- Instruction of Script ------------------------------
+# ---------- Script Information ------------------------------
 # This script aims to pre-process the Nex-Generation-Sequencing (mRNA) Data.
 # Before using this scripts, there are several pre-req need to be done. 
 #   1. Download the following packages & tools. It is OK to download the following or newer version. 
 #       a. if any package need to be download manually, put them into '~/Desktop/mRNA_rz_2022/seq_tools'
 #   2. Download the referencing genome from GenBank or RefSeq of NCBI, rename as 'ref_genome.fna' -> '~/Desktop/mRNA_rz_2022/ref_genome'
 
+# ---------- User Instruction ------------------------------
+#   1. Double-check the directories of your work
+#   2. Install the Tools listed in the Tools Information Section
+#   3. Install bash and vim on user's PC
+#   4. use vim to make any changes in the script 
+#   5. use bash to run the script
 
-# ---------- Basic Information ------------------------------
+# ---------- Tools Information ------------------------------
 # package & tools used
 #   1. FastQC High Throughput Sequence QC Report - version 0.11.9
 #   2. Trimmomatic - version 0.39
@@ -113,15 +119,13 @@ echo "FASTQC Summaries Exported!"
 # ---------- Sequence Alignment w/z ref_genome ------------------------------
 echo "Running Sequence Alignment ..."
 
-bwa index ~/Desktop/mRNA_rz_2022/ref_genome/ref_genome.fna ###index the referencing genome
-
 cd ~/Desktop/mRNA_rz_2022/mRNA_data_processed/mRNA_data_trim
 
 for infile in *_R1_trim.fastq.gz
 do
   base=$(basename ${infile} _R1_trim.fastq.gz)
-  bwa mem ~/Desktop/ref_genome/ref_genome.fna \ ###use mem method and call reference genome
-          ${infile} ${base}_R2_trim.fastq.gz > \
+  bwa index ~/Desktop/mRNA_rz_2022/ref_genome/ref_genome.fna ###index the referencing genome
+  bwa mem ~/Desktop/mRNA_rz_2022/ref_genome/ref_genome.fna ${infile} ${base}_R2_trim.fastq.gz > \
           ~/Desktop/mRNA_rz_2022/mRNA_data_processed/sam/${base}_align.sam
 done
 
