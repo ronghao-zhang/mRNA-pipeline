@@ -88,7 +88,8 @@ do
             ${infile} ${base}_R2.fastq.gz \
             ${base}_R1_trim.fastq.gz ${base}_R1_untrim.fastq.gz \
             ${base}_R2_trim.fastq.gz ${base}_R2_untrim.fastq.gz \
-            ILLUMINACLIP:NexteraPE-PE.fa:2:40:15 SLIDINGWINDOW:4:20 MINLEN:25
+            # ILLUMINACLIP:NexteraPE-PE.fa:2:40:15 \ ## Need to install the NexteraPE-PE.fa
+            SLIDINGWINDOW:4:20 MINLEN:25
 done
 mv *trim.fastq.gz ~/Desktop/mRNA_rz_2022/mRNA_data_processed/mRNA_data_trim
 
@@ -100,7 +101,7 @@ echo "Running FASTQC for Trimmed Data ..."
 
 ## perform quality check on trimmed mRNA samples
 cd ~/Desktop/mRNA_rz_2022/mRNA_data_processed/mRNA_data_trim
-fastqc ./*.fastq.gz 
+fastqc ./*_trim.fastq.gz 
 mv ./*fastqc.html ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_trim
 mv ./*fastqc.zip ~/Desktop/mRNA_rz_2022/mRNA_data_processed/fastqc_trim 
 
